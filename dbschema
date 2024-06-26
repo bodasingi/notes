@@ -1,0 +1,57 @@
+To retrieve data from the tables described (Order, Implants, and Configs) in the schema I provided earlier, you typically use SQL queries. Here's how you can find one data item, such as retrieving information about a specific order along with its implants and configurations:
+
+### Example SQL Query:
+
+Let's say you want to retrieve details about an order with a specific `order_id`, including its associated implants and configurations.
+
+```sql
+SELECT 
+    o.order_id,
+    o.patient_id,
+    o.exam_date,
+    i.implant_id,
+    i.implant_type,
+    i.quantity,
+    i.description,
+    c.config_id,
+    c.config_name,
+    c.config_value
+FROM 
+    Order o
+LEFT JOIN 
+    Implants i ON o.order_id = i.order_id
+LEFT JOIN 
+    Configs c ON o.order_id = c.order_id
+WHERE 
+    o.order_id = <your_order_id>;
+```
+
+### Explanation:
+
+1. **SELECT Clause**: Specifies the columns you want to retrieve from the tables.
+   - `o.order_id`, `o.patient_id`, `o.exam_date`: Columns from the `Order` table.
+   - `i.implant_id`, `i.implant_type`, `i.quantity`, `i.description`: Columns from the `Implants` table.
+   - `c.config_id`, `c.config_name`, `c.config_value`: Columns from the `Configs` table.
+
+2. **FROM Clause**: Specifies the main table (`Order`) from which you are retrieving data.
+
+3. **JOIN Clauses**: Connects the `Order` table with the `Implants` and `Configs` tables based on the `order_id` foreign key.
+   - `LEFT JOIN Implants i ON o.order_id = i.order_id`: Joins `Order` with `Implants`. This is a left join because an order may have zero or more implants.
+   - `LEFT JOIN Configs c ON o.order_id = c.order_id`: Joins `Order` with `Configs`. This is also a left join for the same reason.
+
+4. **WHERE Clause**: Filters the result set to only include rows where the `order_id` matches a specific value (`<your_order_id>`). Replace `<your_order_id>` with the actual order ID you are interested in.
+
+### Notes:
+- If an order has multiple implants and configurations, this query will return multiple rows, one for each combination of implants and configurations associated with that order.
+- Adjust the query according to your specific database system (syntax might vary slightly for different SQL dialects).
+
+### Example Output:
+If you execute this query with `order_id = 123`, and assuming there is data in your tables corresponding to that order, you would get a result set like:
+
+| order_id | patient_id | exam_date  | implant_id | implant_type | quantity | description | config_id | config_name | config_value |
+|----------|------------|------------|------------|--------------|----------|-------------|-----------|-------------|--------------|
+| 123      | 456        | 2024-06-25 | 1          | Knee         | 2        | Titanium    | 1         | Size        | Medium       |
+| 123      | 456        | 2024-06-25 | 2          | Hip          | 1        | Stainless   | 2         | Material    | Stainless Steel |
+| 123      | 456        | 2024-06-25 | NULL       | NULL         | NULL     | NULL        | 3         | Color       | Blue         |
+
+This result includes details from the `Order`, `Implants`, and `Configs` tables based on the specified `order_id`. Adjust the columns and join conditions as per your specific schema and query requirements.
